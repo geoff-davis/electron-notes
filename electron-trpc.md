@@ -7,7 +7,7 @@ The Electron documentation recommends using [inter-process communication](https:
 * It's clunky and involves a lot of boilerplate in a privileged preload file.
 * IPC calls aren't type safe and don't do any validation on arguments.
 
-Several people in [r/electronjs](https://www.reddit.com/r/electronjs/search/?q=electron-trpc) have expressed enthusiasm about using [tRPC](https://trpc.io/), a popular RPC library, via [electron-trpc](https://github.com/jsonnull/electron-trpc) as an alternative. tRPC is well-documented, but the documentation for the Electron integration is sparse, especially if you're not using React. Here's how I set up `electron-trpc` with vanilla TypeScript.
+Several people in [r/electronjs](https://www.reddit.com/r/electronjs/search/?q=electron-trpc) have expressed enthusiasm about using [tRPC](https://trpc.io/), a popular RPC library, via [electron-trpc](https://github.com/jsonnull/electron-trpc) as an alternative. tRPC is well-documented, but the documentation for the Electron integration is sparse, especially if you're not using React. Here's how to set up `electron-trpc` with vanilla TypeScript.
 
 ## Installation
 
@@ -166,7 +166,7 @@ import { BrowserWindow } from 'electron';
 
 // Define a type for the context
 export interface Context {
-  currentWindow: BrowserWindow | null;
+  window_id: number | null;
 }
 
 // Create a function to initialize the context
@@ -175,9 +175,10 @@ export const createContext = async ({
 }: {
   event: Electron.IpcMainInvokeEvent;
 }): Promise<Context> => {
-  // Get the BrowserWindow from the event
-  const currentWindow = BrowserWindow.fromWebContents(event.sender);
-  return Promise.resolve({ currentWindow }); // Store the BrowserWindow in the context
+  const window = BrowserWindow.fromWebContents(event.sender);
+  const window_id = window?.id ?? null;
+  // Return a Promise that resolves to a Context object
+  return Promise.resolve({ window_id });
 };
 ```
 
@@ -224,6 +225,7 @@ it is an optional argument in method signatures. Our `greeting`
 method doesn't use the context, so we don't add it to the signature.
 
 ```typescript
+import { BrowserWindow } from 'electron';
 import { initTRPC } from '@trpc/server';
 import { z } from 'zod';
 import { Context } from './context';
@@ -239,11 +241,12 @@ export const appRouter = t.router({
       return `Hello, ${input.name}!`;
     }),
 
-  setWindowTitle: t.procedure
+  setWindowTitle: procedure
     .input(z.string().min(1, 'Title cannot be empty'))
     .mutation(({ ctx, input }: { ctx: Context; input: string }) => {
-      if (!ctx.currentWindow) throw new Error('No window found!');
-      ctx.currentWindow.setTitle(input); // Set the window title
+      if (!ctx.window_id) throw new Error('No window found!');
+      const window = BrowserWindow.fromId(ctx.window_id)!;
+      window.setTitle(input); // Set the window title
       return `Title changed to: ${input}`;
     }),
 });
