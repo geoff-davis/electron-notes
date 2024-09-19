@@ -15,8 +15,8 @@ tRPC uses [Zod](https://zod.dev/) to validate RPC arguments, so we have to insta
 
 ```bash
 cd myappname
-npm install -D electron-trpc
-npm install -D zod  # used for validation of rpc arguments
+npm install electron-trpc
+npm install zod  # used for validation of rpc arguments
 ```
 
 ### Simple usage
