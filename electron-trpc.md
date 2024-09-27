@@ -35,7 +35,7 @@ Our `greeting` method expects an object with a string property called `name`. We
 import { initTRPC } from '@trpc/server';
 import { z } from 'zod';
 
-const t = initTRPC().create({
+const t = initTRPC.create({
   isServer: true,
 });
 
