@@ -82,6 +82,8 @@ module.exports = {
 
 ### VSCode configuration files
 
+These files let you launch and debug your app from within VSCode:
+
 `.vscode/launch.json` (from [here](https://github.com/hawkeye64/electron-quasar-file-explorer-v2/blob/72011a5dedb47b543c7aa2fe9f4e354cc857e1f7/.vscode/launch.json#L6))
 
 ```json
@@ -138,6 +140,7 @@ module.exports = {
 ```
 
 Add the following file in `./src-electron` to prevent an error alert when launching debug from VSCode:
+
 `src-electron/electron-main.cjs`:
 
 ```js
@@ -148,6 +151,8 @@ require('./electron-main.ts');
 ## Configurations
 
 ### prettier
+
+Some tweaks to Prettier's JS preferences (prefer single to double quotes, use semicolons at the ends of lines, add trailing commas at the end of lists, enable the Tailwind CSS plugin)
 
 `.prettierrc`:
 
@@ -287,7 +292,18 @@ import { attachWindow, detachWindow } from './router/ipc-setup';
 
 
 // Construct mainWindow here
-
+mainWindow = new BrowserWindow({
+  // ...
+  webPreferences: {
+    contextIsolation: true,
+    nodeIntegration: false,
+    // You must disable sandboxing if nodeIntegration=false to
+    // allow the preload script to set up TRPC
+    sandbox: false,  
+    ...
+  },
+  // ...
+});
 // Attach the window to the IPC handler
 attachWindow(mainWindow);
 // Remove the IPC handler when the window is closed
@@ -310,7 +326,26 @@ process.once('loaded', async () => {
 });
 ```
 
+Construct a client in the renderer to call router methods:
+
+```ts
+import { createTRPCProxyClient } from '@trpc/client';
+import { ipcLink } from 'electron-trpc-patched/renderer';
+import type { AppRouter } from '../../src-electron/router/router';
+
+const client = createTRPCProxyClient<AppRouter>({ links: [ipcLink()] });
+
+function changeWindowName() {
+  client.setWindowTitle.mutate(window_name.value);
+}
+```
+
 ## Testing
+
+Here we'll set up some basic unit tests with [mocha](https://mochajs.org/) / [chai](https://www.chaijs.com/guide/) / [sinon](https://sinonjs.org/).
+
+[!NOTE]
+Jest is another popular testing framework, but [it isn't fully supported by `vite`](https://jestjs.io/docs/getting-started#using-vite). There is a workaround via [vite-jest](https://github.com/haoqunjiang/vite-jest/tree/main), but it has [some important limitations](https://github.com/haoqunjiang/vite-jest/tree/main/packages/vite-jest#limitations-and-differences-with-commonjs-tests).
 
 ### Install packages
 
