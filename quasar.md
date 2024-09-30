@@ -88,9 +88,6 @@ These files let you launch and debug your app from within VSCode:
 
 ```json
 {
-  // Use IntelliSense to learn about possible attributes.
-  // Hover to view descriptions of existing attributes.
-  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
     {
@@ -344,8 +341,8 @@ function changeWindowName() {
 
 Here we'll set up some basic unit tests with [mocha](https://mochajs.org/) / [chai](https://www.chaijs.com/guide/) / [sinon](https://sinonjs.org/).
 
-[!NOTE]
-Jest is another popular testing framework, but [it isn't fully supported by `vite`](https://jestjs.io/docs/getting-started#using-vite). There is a workaround via [vite-jest](https://github.com/haoqunjiang/vite-jest/tree/main), but it has [some important limitations](https://github.com/haoqunjiang/vite-jest/tree/main/packages/vite-jest#limitations-and-differences-with-commonjs-tests).
+> [!NOTE]
+> Jest is another popular testing framework, but [it isn't fully supported by `vite`](https://jestjs.io/docs/getting-started#using-vite). There is a workaround via [vite-jest](https://github.com/haoqunjiang/vite-jest/tree/main), but it has [some important limitations](https://github.com/haoqunjiang/vite-jest/tree/main/packages/vite-jest#limitations-and-differences-with-commonjs-tests).
 
 ### Install packages
 
